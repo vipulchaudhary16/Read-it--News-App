@@ -33,8 +33,8 @@ public class NewsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
-        DownloadTask task = new DownloadTask();
 
+        DownloadTask task = new DownloadTask();
         try {
             task.execute("https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty");
         } catch (Exception e) {
@@ -50,29 +50,11 @@ public class NewsActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... urls) {
-            String result = " ";
-            URL url;
-            HttpsURLConnection urlConnection = null;
-
             try {
-                url = new URL(urls[0]);
-                urlConnection = (HttpsURLConnection) url.openConnection();
-                InputStream inputStream = urlConnection.getInputStream();
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-
-                int data = inputStreamReader.read();
-
-                StringBuilder resultBuilder = new StringBuilder(" ");
-
-                while (data != -1) {
-                    char current = (char) data;
-                    resultBuilder.append(current);
-                    data = inputStreamReader.read();
-                }
-                result = resultBuilder.toString();
+                String result = LoadData.loadDataFromUrl(new URL(urls[0]));
 
                 JSONArray jsonArray = new JSONArray(result);
-                int numberOfResult = 20;
+                int numberOfResult = Consts.resultLimit;
 
                 if (jsonArray.length() < 20) {
                     numberOfResult = jsonArray.length();
@@ -80,53 +62,21 @@ public class NewsActivity extends AppCompatActivity {
 
                 for (int i = 0; i < numberOfResult; i++) {
                     String articleID = jsonArray.getString(i);
-                    url = new URL("https://hacker-news.firebaseio.com/v0/item/" + articleID + ".json?print=pretty");
-
-                    urlConnection = (HttpsURLConnection) url.openConnection();
-                    inputStream = urlConnection.getInputStream();
-                    inputStreamReader = new InputStreamReader(inputStream);
-
-
-                    String articleInfo = " ";
-                    data = inputStreamReader.read();
-
-                    resultBuilder = new StringBuilder(" ");
-
-                    while (data != -1) {
-                        char current = (char) data;
-                        resultBuilder.append(current);
-                        data = inputStreamReader.read();
-                    }
-                    articleInfo = resultBuilder.toString();
-
+                    URL url = new URL("https://hacker-news.firebaseio.com/v0/item/" + articleID + ".json?print=pretty");
+                    String articleInfo = LoadData.loadDataFromUrl(url);
                     JSONObject jsonObject = new JSONObject(articleInfo);
 
                     if (!jsonObject.isNull("title") && !jsonObject.isNull("url")) {
                         String articleTitle = jsonObject.getString("title");
                         String articleUrl = jsonObject.getString("url");
-
-                        url = new URL(articleUrl);
-                        urlConnection = (HttpsURLConnection) url.openConnection();
-                        inputStream = urlConnection.getInputStream();
-                        inputStreamReader = new InputStreamReader(inputStream);
-                        data = inputStreamReader.read();
-                        StringBuilder articleContentBuilder = new StringBuilder();
-
-                        while (data!=-1){
-                            char current = (char) data;
-                            articleContentBuilder.append(current);
-                            data = inputStreamReader.read();
-                        }
-
-                        String articleContent = articleContentBuilder.toString();
-
+                        String articleContent = LoadData.loadDataFromUrl(new URL(articleUrl));
                         Log.i("article content " , articleContent);
                     }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return result;
+            return Consts.error;
         }
     }
 }

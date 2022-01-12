@@ -17,7 +17,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Timer timer = new Timer("Timer");;
-        timer.schedule(task , 2400L);
+        timer.schedule(task , 1400L);
 
         Objects.requireNonNull(getSupportActionBar()).hide();
     }
@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         public void run() {
             Intent intent = new Intent(getApplicationContext() , NewsActivity.class);
             startActivity(intent);
+            finish();
         }
     };
 }

@@ -13,7 +13,9 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -33,10 +35,17 @@ public class NewsActivity extends AppCompatActivity {
     ArrayAdapter adapter;
     ListView newsListView;
 
+    ProgressBar progressBar;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
+
+
+        progressBar = findViewById(R.id.progressBar);
+
 
 
         DownloadTask task = new DownloadTask();
@@ -70,9 +79,12 @@ public class NewsActivity extends AppCompatActivity {
 
     public  class DownloadTask extends AsyncTask<String, Void, String> {
 
+
+
         @Override
         protected String doInBackground(String... urls) {
             try {
+
                 String result = LoadData.loadDataFromUrl(new URL(urls[0]));
 
                 JSONArray jsonArray = new JSONArray(result);
@@ -108,7 +120,7 @@ public class NewsActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-
+            progressBar.setVisibility(View.INVISIBLE);
             updateListView();
         }
 
